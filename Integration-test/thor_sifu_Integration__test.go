@@ -377,64 +377,6 @@ func TestWhereAnySifu(t *testing.T) {
 	}
 }
 
-func TestHeapInitializerWithSifu(t *testing.T) {
-
-	type Person struct {
-		Name       string
-		LastName   string
-		Identifier int
-		Mail       string
-		Active     bool
-	}
-
-	var personList []Person
-	personList = append(personList, Person{
-		Name:       "Jane",
-		LastName:   "Jane",
-		Identifier: 5,
-		Mail:       "Jane@gmail.com",
-		Active:     true,
-	})
-
-	personList = append(personList, Person{
-		Name:       "Jack",
-		LastName:   "Jack",
-		Identifier: 3,
-		Mail:       "Jack@gmail.com",
-		Active:     true,
-	})
-
-	personList = append(personList, Person{
-		Name:       "Jack",
-		LastName:   "Jack",
-		Identifier: 1,
-		Mail:       "Jack@gmail.com",
-		Active:     true,
-	})
-
-	personList = append(personList, Person{
-		Name:       "Martin",
-		LastName:   "Martin",
-		Identifier: 18,
-		Mail:       "Jack@gmail.com",
-		Active:     false,
-	})
-
-	personList = append(personList, Person{
-		Name:       "Marcus",
-		LastName:   "Marcus",
-		Identifier: 2,
-		Mail:       "Jack@gmail.com",
-		Active:     true,
-	})
-
-	expr := Sifu.Expr[Person]()
-
-	result := collections.From(&personList).Where(expr.Prop("Active").True().Predicate()).Collect()
-
-	fmt.Println(result)
-}
-
 func TestOpFusionWithSifu(t *testing.T) {
 
 	type Person struct {
@@ -648,7 +590,9 @@ func TestTakeOperatorWithSifu(t *testing.T) {
 }
 
 func TestTakeEdgeCasesWithSifu(t *testing.T) {
+
 	var numbers []int
+
 	for i := 1; i <= 10; i++ {
 		numbers = append(numbers, i)
 	}
@@ -919,6 +863,7 @@ func TestCollectTakeSkipFilterWithSifu(t *testing.T) {
 	)
 
 	expr := Sifu.Expr[Employee]()
+
 	result := collections.From(&employees).Where(expr.Prop("Department").StrEq("IT").Predicate()).Take(1).Skip(1).Collect()
 
 	if len(result) != 1 {
