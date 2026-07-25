@@ -54,6 +54,7 @@ type ISorter[T any] interface {
 type CompiledQueryable[T any] struct {
 	Operators []ZenqlOperator[T]
 	Items     *[]T
+	Compiler  func() []T
 }
 type ZenqlOperator[T any] struct {
 	Filter       IFilter[T]

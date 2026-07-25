@@ -65,10 +65,15 @@ func Group[K comparable, T any](op *CollectionCompiledQueryable[T], locator func
 	op.Operators = append(op.Operators, contracts.ZenqlOperator[T]{
 		OperatorType: GroupCollection,
 	})
+	compilation := contracts.CompiledQueryable[T]{
+		Operators: nil,
+		Items:     nil,
+		Compiler:  op.Collect,
+	}
 	return &GroupCompiledQueryable[K, T]{
-		CollectionCompiler: op.Collect,
-		PropLocator:        locator,
-		Page:               op.Page,
+		CompiledQueryable: compilation,
+		PropLocator:       locator,
+		Page:              op.Page,
 	}
 }
 
@@ -441,7 +446,7 @@ func (op *GroupCompiledQueryable[K, T]) Collect() *GroupedQueryable[K, T] {
 
 	var result GroupedQueryable[K, T]
 
-	compiledResult := op.CollectionCompiler()
+	compiledResult := op.CompiledQueryable.Compiler()
 
 	result.Items = contracts.AllocateMap[K, T](len(compiledResult))
 
