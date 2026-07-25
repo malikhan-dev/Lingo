@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	_ "math/rand"
+	"os"
+	"runtime/pprof"
 	"testing"
 	"time"
 
@@ -40,7 +42,8 @@ func LoadLargeData() {
 
 func init() {
 
-	contracts.SetMaxAllocGuard(25000000)
+	/*	contracts.DisableMemoryManagement()
+	 */contracts.SetMaxAllocGuard(25000000)
 	LoadLargeData()
 
 }
@@ -82,17 +85,33 @@ func TestSifuTrueFalseAnd(t *testing.T) {
 
 func BenchmarkQueryEngineWithSifu(b *testing.B) {
 
+	f, err := os.Create("cpu.pprof")
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer f.Close()
+
+	if err := pprof.StartCPUProfile(f); err != nil {
+		panic(err)
+	}
+
+	defer pprof.StopCPUProfile()
+
+	b.ResetTimer()
+
 	expr := Sifu.Expr[ComplexObjectToSearch]()
 
-	query1 := expr.Prop("Name").StrEq("Jane").And(expr.Prop("Flag").True())
+	query1 := expr.Prop("Name").StrEq("Jane").And(expr.Prop("Flag").True()).Predicate()
 
-	query2 := expr.Prop("Name").StrEqNot("Jane").Or(expr.Prop("Flag").False())
+	query2 := expr.Prop("Name").StrEqNot("Jane").Or(expr.Prop("Flag").False()).Predicate()
 
 	for i := 0; i < b.N; i++ {
 
-		result := collections.From(&items).WhereEx(query1).Collect()
+		result := collections.From(&items).Where(query1).Collect()
 
-		result2 := collections.From(&result).AnyEx(query2).Assert()
+		result2 := collections.From(&result).Any(query2).Assert()
 
 		if result2 {
 			b.Error("result should be false")
@@ -108,10 +127,11 @@ func TestGroupByNewWithSifu(t *testing.T) {
 
 	res :=
 		collections.Group[bool, ComplexObjectToSearch](
-			collections.From(&items).Where(expr.Prop("Age").NumBigger(20).Predicate()).Update(expr.Prop("Age").SetInt(65).Predicate()),
-			func(item ComplexObjectToSearch) bool {
-				return item.Flag
-			}).Collect()
+			collections.From(&items).Where(
+				expr.Prop("Age").NumBigger(20).Predicate()).
+				Update(expr.Prop("Age").SetInt(65).Predicate()),
+			Sifu.KeyAs[ComplexObjectToSearch, bool](expr.Prop("Flag")).Predicate(),
+		).Collect()
 
 	if res.Items[false][1].Id != 24 {
 		t.Error("Expected 24,")
@@ -227,7 +247,7 @@ func TestNestedSearch_Thor_WithSifu(t *testing.T) {
 	})
 
 	UserList = append(UserList, User{
-		Name: "marty",
+		Name: "martin",
 		Id:   1,
 		Addr: []Address{
 			{
@@ -253,7 +273,12 @@ func TestNestedSearch_Thor_WithSifu(t *testing.T) {
 		).Predicate(),
 	).Collect()
 
-	fmt.Println(res)
+	if res[0].Name != "max" {
+		t.Errorf("Expected,max, got %s", res[0].Name)
+	}
+	if res[1].Name != "martin" {
+		t.Errorf("Expected,martin, got %s", res[1].Name)
+	}
 
 }
 
@@ -365,73 +390,12 @@ func TestWhereAnySifu(t *testing.T) {
 
 	if len(mat) <= 0 {
 		t.Error("Find Failed")
-	} else {
-		fmt.Println(mat)
 	}
-
 	assertion2 := collections.From(&UserList).Where(expr.Prop("Id").NumSmaller(5).Predicate()).Any(expr.Prop("Name").StrEq("Wade").Predicate()).Assert()
 
 	if !assertion2 {
 		t.Error("Wade should exists")
 	}
-}
-
-func TestHeapInitializerWithSifu(t *testing.T) {
-
-	type Person struct {
-		Name       string
-		LastName   string
-		Identifier int
-		Mail       string
-		Active     bool
-	}
-
-	var personList []Person
-	personList = append(personList, Person{
-		Name:       "Jane",
-		LastName:   "Jane",
-		Identifier: 5,
-		Mail:       "Jane@gmail.com",
-		Active:     true,
-	})
-
-	personList = append(personList, Person{
-		Name:       "Jack",
-		LastName:   "Jack",
-		Identifier: 3,
-		Mail:       "Jack@gmail.com",
-		Active:     true,
-	})
-
-	personList = append(personList, Person{
-		Name:       "Jack",
-		LastName:   "Jack",
-		Identifier: 1,
-		Mail:       "Jack@gmail.com",
-		Active:     true,
-	})
-
-	personList = append(personList, Person{
-		Name:       "Martin",
-		LastName:   "Martin",
-		Identifier: 18,
-		Mail:       "Jack@gmail.com",
-		Active:     false,
-	})
-
-	personList = append(personList, Person{
-		Name:       "Marcus",
-		LastName:   "Marcus",
-		Identifier: 2,
-		Mail:       "Jack@gmail.com",
-		Active:     true,
-	})
-
-	expr := Sifu.Expr[Person]()
-
-	result := collections.From(&personList).Where(expr.Prop("Active").True().Predicate()).Collect()
-
-	fmt.Println(result)
 }
 
 func TestOpFusionWithSifu(t *testing.T) {
@@ -450,7 +414,7 @@ func TestOpFusionWithSifu(t *testing.T) {
 		personList = append(personList, Person{
 			Name:       "Jane",
 			LastName:   "Jane",
-			Identifier: 5,
+			Identifier: i,
 			Active:     active,
 		})
 		active = !active
@@ -464,7 +428,13 @@ func TestOpFusionWithSifu(t *testing.T) {
 		collections.From(&personList).Where(expr.Prop("Identifier").NumBigger(0).Predicate()), Sifu.KeyAs[Person, bool](expr.Prop("Active")).Predicate(),
 	).Collect()
 
-	fmt.Println(groupped.Items)
+	if groupped.Items[false][3].Identifier != 8 {
+		t.Errorf("expected 8, got %d", groupped.Items[false][3].Identifier)
+	}
+
+	if groupped.Items[true][1].Identifier != 3 {
+		t.Errorf("expected 3, got %d", groupped.Items[true][1].Identifier)
+	}
 }
 
 func TestFuseAnyWithSifu(t *testing.T) {
@@ -530,12 +500,11 @@ func TestFuseAnyWithSifu(t *testing.T) {
 	if len(assert1) <= 0 {
 		t.Error("Find Failed")
 	}
-	fmt.Println(assert1)
 
 	if !assert2 {
 		t.Error("Find Failed")
 	}
-	fmt.Println(assert2)
+
 }
 
 func TestProject1WithSifu(t *testing.T) {
@@ -617,7 +586,9 @@ func TestProject1WithSifu(t *testing.T) {
 		MapPersonToSysUser,
 	)
 
-	fmt.Println(newUsers)
+	if newUsers[0].FName != "Jane" || newUsers[1].FName != "Mark" {
+		t.Error("Projection Failed")
+	}
 }
 
 func TestTakeOperatorWithSifu(t *testing.T) {
@@ -647,7 +618,9 @@ func TestTakeOperatorWithSifu(t *testing.T) {
 }
 
 func TestTakeEdgeCasesWithSifu(t *testing.T) {
+
 	var numbers []int
+
 	for i := 1; i <= 10; i++ {
 		numbers = append(numbers, i)
 	}
@@ -918,6 +891,7 @@ func TestCollectTakeSkipFilterWithSifu(t *testing.T) {
 	)
 
 	expr := Sifu.Expr[Employee]()
+
 	result := collections.From(&employees).Where(expr.Prop("Department").StrEq("IT").Predicate()).Take(1).Skip(1).Collect()
 
 	if len(result) != 1 {
@@ -1567,7 +1541,7 @@ func TestUpdateAppStruct(t *testing.T) {
 	if updated_result[0].Addr[1].City != "La" {
 		t.Errorf("Failed to set struct")
 	}
-	fmt.Println(updated_result[0].Addr)
+
 }
 
 func TestUpdateSetStruct(t *testing.T) {
@@ -1674,7 +1648,35 @@ func TestSort(t *testing.T) {
 
 }
 
-func TestProjecttionFusedWithOtherOperators(t *testing.T) {
+func BenchmarkSort(b *testing.B) {
+
+	expr := Sifu.Expr[ComplexObjectToSearch]()
+
+	result := collections.From(&items).
+		WhereEx(expr.Prop("Flag").True()).
+		Take(2).SortEx(expr.Prop("Id").Less(), true).
+		UpdateEx(expr.Prop("Name").SetString(" Updated")).
+		Collect()
+
+	result2 := collections.From(&items).
+		WhereEx(expr.Prop("Flag").True()).
+		Take(2).SortEx(expr.Prop("Id").Less(), false).
+		UpdateEx(expr.Prop("Name").SetString(" Updated")).
+		Collect()
+
+	if result[0].Id != 199999 {
+
+		b.Error("sort failed")
+	}
+
+	if result2[0].Id != 1 {
+
+		b.Error("sort failed")
+	}
+
+}
+
+func TestProjectionFusedWithOtherOperators(t *testing.T) {
 
 	type Addr struct {
 		City string

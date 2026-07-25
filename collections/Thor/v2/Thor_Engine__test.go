@@ -68,13 +68,13 @@ func TestGroupByNew(t *testing.T) {
 				return item.Flag
 			}).Collect()
 
-	fmt.Println(res.Items[false][1])
-	fmt.Println(res.Items[true][1])
+	if res.Items[false][0].Id != 22 {
+		t.Errorf("Expected,22, got %d", res.Items[false][0].Id)
+	}
 
-	fmt.Println("==========================================================")
-	fmt.Println("==========================================================")
-	fmt.Println("==========================================================")
-
+	if res.Items[true][0].Id != 21 {
+		t.Errorf("Expected,21, got %d", res.Items[true][0].Id)
+	}
 }
 
 func TestValidFilter(t *testing.T) {
@@ -191,7 +191,7 @@ func TestNestedSearch_Thor(t *testing.T) {
 	})
 
 	UserList = append(UserList, User{
-		Name: "marty",
+		Name: "martin",
 		Id:   1,
 		Addr: []Address{
 			{
@@ -216,7 +216,12 @@ func TestNestedSearch_Thor(t *testing.T) {
 
 		}).Collect()
 
-	fmt.Println(res)
+	if res[0].Name != "max" {
+		t.Errorf("Expected,max, got %s", res[0].Name)
+	}
+	if res[1].Name != "martin" {
+		t.Errorf("Expected,martin, got %s", res[1].Name)
+	}
 
 }
 func TestWhereAny(t *testing.T) {
@@ -325,8 +330,6 @@ func TestWhereAny(t *testing.T) {
 
 	if len(mat) <= 0 {
 		t.Error("Find Failed")
-	} else {
-		fmt.Println(mat)
 	}
 
 	assertion2 := From(&UserList).Where(func(user User) bool {
@@ -349,13 +352,11 @@ func TestOpFusion(t *testing.T) {
 		personList = append(personList, Person{
 			Name:       "Jane",
 			LastName:   "Jane",
-			Identifier: 5,
+			Identifier: i,
 			Active:     active,
 		})
 		active = !active
 	}
-
-	fmt.Println(personList)
 
 	groupped := Group[bool, Person](
 
@@ -366,7 +367,14 @@ func TestOpFusion(t *testing.T) {
 		},
 	).Collect()
 
-	fmt.Println(groupped.Items)
+	if groupped.Items[false][3].Identifier != 8 {
+		t.Errorf("expected 8, got %d", groupped.Items[false][3].Identifier)
+	}
+
+	if groupped.Items[true][1].Identifier != 3 {
+		t.Errorf("expected 3, got %d", groupped.Items[true][1].Identifier)
+	}
+
 }
 
 func TestFuseAny(t *testing.T) {
@@ -426,12 +434,11 @@ func TestFuseAny(t *testing.T) {
 	if len(assert1) <= 0 {
 		t.Error("Find Failed")
 	}
-	fmt.Println(assert1)
 
 	if !assert2 {
 		t.Error("Find Failed")
 	}
-	fmt.Println(assert2)
+
 }
 
 func TestProject1(t *testing.T) {
@@ -494,7 +501,9 @@ func TestProject1(t *testing.T) {
 		MapPersonToSysUser,
 	)
 
-	fmt.Println(newUsers)
+	if newUsers[0].FName != "Jane" || newUsers[1].FName != "Mark" {
+		t.Error("Projection Failed")
+	}
 }
 
 func TestTakeOperator(t *testing.T) {

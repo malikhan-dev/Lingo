@@ -9,8 +9,14 @@ import (
 
 var maxAllocGuard = 5000000
 
+var enabled = true
+
 func SetMaxAllocGuard(max int) {
 	maxAllocGuard = max
+}
+
+func DisableMemoryManagement() {
+	enabled = false
 }
 
 type HeapSnapshot struct {
@@ -56,7 +62,9 @@ func Alloc[T any](itemCount int) int {
 	freeHeap := getFreeHeap()
 
 	var t T
+
 	itemSize := unsafe.Sizeof(t)
+
 	estimated := uint64(itemCount) * uint64(itemSize)
 
 	if estimated > freeHeap/2 {
@@ -74,13 +82,25 @@ func Guard(estimatedSize int) int {
 }
 
 func AllocateSlice[T any](itemCount int) []T {
-	return make([]T, 0, Guard(Alloc[T](itemCount)))
+
+	if enabled {
+		return make([]T, 0, Guard(Alloc[T](itemCount)))
+	} else {
+		return make([]T, 0, itemCount)
+	}
+
 }
 
 func AllocateMap[K comparable, T any](keyCount int) map[K][]T {
-	capacity := Guard(keyCount / 2)
-	if keyCount < 100 {
-		capacity = keyCount
+
+	if enabled {
+		capacity := Guard(keyCount / 2)
+		if keyCount < 100 {
+			capacity = keyCount
+		}
+		return make(map[K][]T, capacity)
+	} else {
+		return make(map[K][]T, keyCount)
 	}
-	return make(map[K][]T, capacity)
+
 }

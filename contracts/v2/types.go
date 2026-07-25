@@ -54,6 +54,7 @@ type ISorter[T any] interface {
 type CompiledQueryable[T any] struct {
 	Operators []ZenqlOperator[T]
 	Items     *[]T
+	Compiler  func() []T
 }
 type ZenqlOperator[T any] struct {
 	Filter       IFilter[T]
@@ -63,8 +64,8 @@ type ZenqlOperator[T any] struct {
 }
 
 type PageOption struct {
-	Limit int32
-	Skip  int32
+	Limit int
+	Skip  int
 }
 
 type CollectStream[T any] struct {
