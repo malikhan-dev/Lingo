@@ -229,7 +229,7 @@ func (op *CollectionCompiledQueryable[T]) Collect() []T {
 
 	var wg sync.WaitGroup
 
-	wg.Add(3)
+	wg.Add(2)
 
 	var slice []T
 
@@ -255,10 +255,6 @@ func (op *CollectionCompiledQueryable[T]) Collect() []T {
 
 	go func() {
 		HasUpdate, UpdateFunc = ExtractUpdateMeta(op.Operators)
-		wg.Done()
-	}()
-
-	go func() {
 		FilterFunc = ExtractFilterMeta(op.Operators)
 		wg.Done()
 	}()

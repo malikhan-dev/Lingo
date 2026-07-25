@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	_ "math/rand"
+	"os"
+	"runtime/pprof"
 	"testing"
 	"time"
 
@@ -81,6 +83,22 @@ func TestSifuTrueFalseAnd(t *testing.T) {
 }
 
 func BenchmarkQueryEngineWithSifu(b *testing.B) {
+
+	f, err := os.Create("cpu.pprof")
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer f.Close()
+
+	if err := pprof.StartCPUProfile(f); err != nil {
+		panic(err)
+	}
+
+	defer pprof.StopCPUProfile()
+
+	b.ResetTimer()
 
 	expr := Sifu.Expr[ComplexObjectToSearch]()
 
