@@ -254,14 +254,14 @@ func (op *CollectionCompiledQueryable[T]) Collect() []T {
 
 		}
 
-		wg.Done()
+		defer wg.Done()
 
 	}()
 
 	go func() {
 		HasUpdate, UpdateFunc = ExtractUpdateMeta(op.Operators)
 		FilterFunc = ExtractFilterMeta(op.Operators)
-		wg.Done()
+		defer wg.Done()
 	}()
 
 	wg.Wait()

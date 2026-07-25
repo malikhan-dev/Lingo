@@ -86,7 +86,7 @@ func AllocateSlice[T any](itemCount int) []T {
 	if enabled {
 		return make([]T, 0, Guard(Alloc[T](itemCount)))
 	} else {
-		return make([]T, 0, itemCount/2)
+		return make([]T, 0, itemCount)
 	}
 
 }
@@ -100,7 +100,7 @@ func AllocateMap[K comparable, T any](keyCount int) map[K][]T {
 		}
 		return make(map[K][]T, capacity)
 	} else {
-		return make(map[K][]T, keyCount/2)
+		return make(map[K][]T, keyCount)
 	}
 
 }

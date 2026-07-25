@@ -42,7 +42,8 @@ func LoadLargeData() {
 
 func init() {
 
-	contracts.SetMaxAllocGuard(25000000)
+	/*	contracts.DisableMemoryManagement()
+	 */contracts.SetMaxAllocGuard(25000000)
 	LoadLargeData()
 
 }
