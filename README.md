@@ -78,11 +78,35 @@ ZenQL is built with speed in mind. Our Thor engine minimizes overhead to keep yo
 
 warning: benchmarks depend on the environment and the results below are the best results collected from a series of repeatable tests.
 
-| Metric | Result |
-| :--- | :--- |
-| **Ops** | 13.6 ms/op |
-| **Allocations** | 0 allocs/op |
-| **Memory** | 22.7 MB/op |
+
+
+
+``` go
+
+File: ___3BenchmarkQueryEngineWithSifu_in_github_com_malikhan_dev_zenql_integration_test.test
+Build ID: c15031f720cfd0a6d298f176ebe93fe0d9858973
+Type: cpu
+Time: 2026-07-25 13:10:53 +0330
+Duration: 1.23s, Total samples = 1.45s (117.71%)
+Entering interactive mode (type "help" for commands, "o" for options)
+(pprof) top
+Showing nodes accounting for 1430ms, 98.62% of 1450ms total
+Showing top 10 nodes out of 28
+      flat  flat%   sum%        cum   cum%
+     570ms 39.31% 39.31%      830ms 57.24%  github.com/malikhan-dev/zenql/collections/Thor/v2.(*CollectionCompiledQueryable[go.shape.struct { Name string; Age int; Id int; Flag bool }]).Collect
+     210ms 14.48% 53.79%      410ms 28.28%  github.com/malikhan-dev/zenql/collections/Thor/v2.(*AssertCompiledQueryable[go.shape.struct { Name string; Age int; Id int; Flag bool }]).Assert
+     210ms 14.48% 68.28%      210ms 14.48%  runtime.madvise
+     100ms  6.90% 75.17%      160ms 11.03%  github.com/malikhan-dev/zenql/integration-test.BenchmarkQueryEngineWithSifu.ExpressionEvaluation[go.shape.struct { Name string; Age int; Id int; Flag bool }].And.func1
+      90ms  6.21% 81.38%       90ms  6.21%  github.com/malikhan-dev/zenql/expressions/Sifu.(*PropExpression[go.shape.struct { Name string; Age int; Id int; Flag bool }]).StrEqNot.func1
+      90ms  6.21% 87.59%       90ms  6.21%  runtime.memclrNoHeapPointers
+      70ms  4.83% 92.41%      370ms 25.52%  github.com/malikhan-dev/zenql/contracts/v2.Filterer[go.shape.struct { Name string; Age int; Id int; Flag bool }].Filter
+      50ms  3.45% 95.86%      140ms  9.66%  github.com/malikhan-dev/zenql/integration-test.BenchmarkQueryEngineWithSifu.ExpressionEvaluation[go.shape.struct { Name string; Age int; Id int; Flag bool }].Or.func2
+      20ms  1.38% 97.24%       40ms  2.76%  github.com/malikhan-dev/zenql/expressions/Sifu.(*PropExpression[go.shape.struct { Name string; Age int; Id int; Flag bool }]).StrEq.func1
+      20ms  1.38% 98.62%       20ms  1.38%  github.com/malikhan-dev/zenql/expressions/Sifu.(*PropExpression[go.shape.struct { Name string; Age int; Id int; Flag bool }]).True.func1
+
+```
+
+
 
 
 
