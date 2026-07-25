@@ -1676,7 +1676,7 @@ func BenchmarkSort(b *testing.B) {
 
 }
 
-func TestProjecttionFusedWithOtherOperators(t *testing.T) {
+func TestProjectionFusedWithOtherOperators(t *testing.T) {
 
 	type Addr struct {
 		City string
