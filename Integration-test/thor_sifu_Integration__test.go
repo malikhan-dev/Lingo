@@ -247,7 +247,7 @@ func TestNestedSearch_Thor_WithSifu(t *testing.T) {
 	})
 
 	UserList = append(UserList, User{
-		Name: "marty",
+		Name: "martin",
 		Id:   1,
 		Addr: []Address{
 			{
@@ -273,7 +273,12 @@ func TestNestedSearch_Thor_WithSifu(t *testing.T) {
 		).Predicate(),
 	).Collect()
 
-	fmt.Println(res)
+	if res[0].Name != "max" {
+		t.Errorf("Expected,max, got %s", res[0].Name)
+	}
+	if res[1].Name != "martin" {
+		t.Errorf("Expected,martin, got %s", res[1].Name)
+	}
 
 }
 
@@ -385,10 +390,7 @@ func TestWhereAnySifu(t *testing.T) {
 
 	if len(mat) <= 0 {
 		t.Error("Find Failed")
-	} else {
-		fmt.Println(mat)
 	}
-
 	assertion2 := collections.From(&UserList).Where(expr.Prop("Id").NumSmaller(5).Predicate()).Any(expr.Prop("Name").StrEq("Wade").Predicate()).Assert()
 
 	if !assertion2 {
@@ -412,7 +414,7 @@ func TestOpFusionWithSifu(t *testing.T) {
 		personList = append(personList, Person{
 			Name:       "Jane",
 			LastName:   "Jane",
-			Identifier: 5,
+			Identifier: i,
 			Active:     active,
 		})
 		active = !active
@@ -426,7 +428,13 @@ func TestOpFusionWithSifu(t *testing.T) {
 		collections.From(&personList).Where(expr.Prop("Identifier").NumBigger(0).Predicate()), Sifu.KeyAs[Person, bool](expr.Prop("Active")).Predicate(),
 	).Collect()
 
-	fmt.Println(groupped.Items)
+	if groupped.Items[false][3].Identifier != 8 {
+		t.Errorf("expected 8, got %d", groupped.Items[false][3].Identifier)
+	}
+
+	if groupped.Items[true][1].Identifier != 3 {
+		t.Errorf("expected 3, got %d", groupped.Items[true][1].Identifier)
+	}
 }
 
 func TestFuseAnyWithSifu(t *testing.T) {
@@ -492,12 +500,11 @@ func TestFuseAnyWithSifu(t *testing.T) {
 	if len(assert1) <= 0 {
 		t.Error("Find Failed")
 	}
-	fmt.Println(assert1)
 
 	if !assert2 {
 		t.Error("Find Failed")
 	}
-	fmt.Println(assert2)
+
 }
 
 func TestProject1WithSifu(t *testing.T) {
@@ -579,7 +586,9 @@ func TestProject1WithSifu(t *testing.T) {
 		MapPersonToSysUser,
 	)
 
-	fmt.Println(newUsers)
+	if newUsers[0].FName != "Jane" || newUsers[1].FName != "Mark" {
+		t.Error("Projection Failed")
+	}
 }
 
 func TestTakeOperatorWithSifu(t *testing.T) {
@@ -1532,7 +1541,7 @@ func TestUpdateAppStruct(t *testing.T) {
 	if updated_result[0].Addr[1].City != "La" {
 		t.Errorf("Failed to set struct")
 	}
-	fmt.Println(updated_result[0].Addr)
+
 }
 
 func TestUpdateSetStruct(t *testing.T) {
@@ -1639,7 +1648,7 @@ func TestSort(t *testing.T) {
 
 }
 
-func BenchmarkSort_10000000(b *testing.B) {
+func BenchmarkSort(b *testing.B) {
 
 	expr := Sifu.Expr[ComplexObjectToSearch]()
 
