@@ -2,7 +2,7 @@
 <img width="20" height="20" src="https://github.com/user-attachments/assets/095647c1-b3dd-4d5a-95ea-bccb3e610585"/>
 <img src="https://img.shields.io/badge/Go-1.25+-00ADD8"/>
 <img src="https://img.shields.io/badge/tests-passing-brightgreen"/>
-<img src="https://img.shields.io/badge/version-2.0.6-green"/>
+<img src="https://img.shields.io/badge/version-2.0.7-green"/>
 <img src="https://visitor-badge.laobi.icu/badge?page_id=malikhan-dev.zenq"/>
 <a href="https://pkg.go.dev/github.com/malikhan-dev/zenql"><img src="https://pkg.go.dev/badge/github.com/malikhan-dev/zenql.svg" alt="Go Reference"/></a>
 <img src="https://img.shields.io/badge/license-MIT-blue"/>
@@ -191,32 +191,33 @@ this release works with following modules
 
 Issues Resolved:
 
-https://github.com/malikhan-dev/zenql/issues/66
+1 - https://github.com/malikhan-dev/zenql/issues/66
 
-and
+2 - https://github.com/malikhan-dev/zenql/issues/65
 
-https://github.com/malikhan-dev/zenql/issues/65
+3 - https://github.com/malikhan-dev/zenql/issues/68
 
+
+
+
+Smart Memory Management can be switched off
 
 Deprecating CollectSorted() and CollectUpdated(). Use Sort()+Collect() and Update() + Collect() instead.
 
 optimizing Sifu's generated code significantly.
  
-Introducing Sifu Expressions Builder. 
-
 Warning: Sifu Expressions prior to v1.0.3 is unstable for production use. upgrade to v1.0.3.
 
-Query your in-memory data effortlessly with Sifu Expressions and the Thor Collections API — zero runtime crashes, truly optimized performance.
 
 
 
 ``` go
 		
-    go get github.com/malikhan-dev/zenql/collections/Thor/v2@v2.0.6
+    go get github.com/malikhan-dev/zenql/collections/Thor/v2@v2.0.7
     
-    go get github.com/malikhan-dev/zenql/contracts/v2@v2.0.6
+    go get github.com/malikhan-dev/zenql/contracts/v2@v2.0.7
 
-    go get github.com/malikhan-dev/zenql/expressions/Sifu/@v1.0.5
+    go get github.com/malikhan-dev/zenql/expressions/Sifu/@v1.0.6
     
     go get github.com/malikhan-dev/zenql/streams/v2@v2.0.5
     
@@ -1098,9 +1099,19 @@ Internal allocations are now handled based on several factors, including:
 This new approach helps reduce GC pressure, lowers unnecessary memory consumption, and provides safer behavior in production environments, especially when working with large datasets.
 
 You can configure the maximum allocation guard through the `contracts` module:
+
 ```go
 contracts.SetMaxAllocGuard(200000)
 ```
+
+you can disable this mechanism, simply by calling
+
+``` go
+
+contracts.DisableMemoryManagement()
+
+```
+
 
 This allows ZenQL to use a maximum initial allocation capacity of 200,000 for the underlying array created by make().
 
