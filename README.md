@@ -74,10 +74,49 @@ ZenQL consumes memory very carefully, efficiently and in a controlled and predic
 ### 📊 Performance 
 ZenQL is built with speed in mind. Our Thor engine minimizes overhead to keep your application blazing fast.
 
-**Benchmark: Filtering 50,000,000 records via collections api**
+**Benchmark: Filtering and Validating 50,000,000 records via collections api**
 
 warning: benchmarks depend on the environment and the results below are the best results collected from a series of repeatable tests.
 
+
+
+``` go
+
+f, err := os.Create("cpu.pprof")
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer f.Close()
+
+	if err := pprof.StartCPUProfile(f); err != nil {
+		panic(err)
+	}
+
+	defer pprof.StopCPUProfile()
+
+	b.ResetTimer()
+
+	expr := Sifu.Expr[ComplexObjectToSearch]()
+
+	query1 := expr.Prop("Name").StrEq("Jane").And(expr.Prop("Flag").True()).Predicate()
+
+	query2 := expr.Prop("Name").StrEqNot("Jane").Or(expr.Prop("Flag").False()).Predicate()
+
+	for i := 0; i < b.N; i++ {
+
+		result := collections.From(&items).Where(query1).Collect()
+
+		result2 := collections.From(&result).Any(query2).Assert()
+
+		if result2 {
+			b.Error("result should be false")
+		}
+
+	}
+
+```
 
 
 
