@@ -76,6 +76,9 @@ ZenQL is built with speed in mind. Our Thor engine minimizes overhead to keep yo
 
 **Benchmark: Filtering and Validating 50,000,000 records via collections api**
 
+
+best record: 1 second
+
 warning: benchmarks depend on the environment and the results below are the best results collected from a series of repeatable tests.
 
 
