@@ -176,17 +176,17 @@ the migrations process is not really that hard:
 
 this release works with following modules
 
-1 - zenql/collections/Thor/v2@v2.0.6
+1 - zenql/collections/Thor/v2@v2.0.7
 
-2 - zenql/contracts/v2@v2.0.6
+2 - zenql/contracts/v2@v2.0.7
 
 3 - zenql/streams/v2@v2.0.5
 
 4 - zenql/databases/v2@v2.0.6
 
-5 - zenql/expressions/Sifu@v1.0.5
+5 - zenql/expressions/Sifu@v1.0.6
 
-### v2.0.6
+### v2.0.7
 
 
 Issues Resolved:
