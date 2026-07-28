@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/malikhan-dev/zenql/collections/Thor/v2"
+	"github.com/malikhan-dev/zenql/collections/Khan/v2"
 	"github.com/malikhan-dev/zenql/expressions/Sifu"
 )
 

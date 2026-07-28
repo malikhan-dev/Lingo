@@ -1,4 +1,4 @@
-module github.com/malikhan-dev/zenql/collections/Thor/v2
+module github.com/malikhan-dev/zenql/collections/Khan/v2
 
 go 1.25
 

@@ -26,4 +26,3 @@ func FromQueryable[T any](ctx context.Context, BufferSize int, items CollectionC
 	}()
 	return out
 }
-
