@@ -301,6 +301,12 @@ func TestBreakRuntimeWithInvalidNumCompare(t *testing.T) {
 		userExp.Prop("Grade").SetBool(true).Predicate(),
 	).Collect()
 
+	collections.From(&Users).Where(
+		userExp.Prop("Id").NumBigger(12).Predicate(),
+	).Update(
+		userExp.Prop("Grade").SetFloat(12).Predicate(),
+	).Collect()
+
 	result := collections.From(&Users).Where(
 
 		userExp.Prop("Grade").NumBigger(2).Predicate(),
@@ -329,7 +335,7 @@ func TestBreakRuntimeWithInvalidNumSet(t *testing.T) {
 	userExp := Sifu.Expr[SysStudent]()
 
 	result2 := collections.From(&Users).Where(
-		userExp.Prop("Id").NumBigger(0).Predicate(),
+		userExp.Prop("Id").NumBigger(uint8(0)).Predicate(),
 	).Update(
 		userExp.Prop("Grade").SetInt(12).Predicate(),
 	).Collect()
@@ -365,7 +371,7 @@ func TestBreakRuntimeWithInvalidNumSet2(t *testing.T) {
 	userExp := Sifu.Expr[SysStudent]()
 
 	result2 := collections.From(&Users).Where(
-		userExp.Prop("Id").NumBigger(0).Predicate(),
+		userExp.Prop("Id").NumBigger(uint(0)).Predicate(),
 	).Update(
 		userExp.Prop("Id").SetFloat(188.25).Predicate(),
 	).Collect()
@@ -403,12 +409,12 @@ func TestBreakRuntimeWithInvalidNumSet3(t *testing.T) {
 	fmt.Println(case1)
 
 	case2 := collections.From(&list).Where(stdExp.Prop("Id").NumBigger(0).Predicate()).Update(
-		stdExp.Prop("Id").SetFloat(12.25).Predicate(),
+		stdExp.Prop("Id").SetInt(14).Predicate(),
 	).Collect()
 
 	fmt.Println(case2)
 
-	case3 := collections.From(&list).Where(stdExp.Prop("Id").NumBigger(uint(0)).Predicate()).Update(
+	case3 := collections.From(&list).Where(stdExp.Prop("Id").NumBigger(float64(0)).Predicate()).Update(
 		stdExp.Prop("Id").SetUint(180).Predicate(),
 	).Collect()
 

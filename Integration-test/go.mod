@@ -2,7 +2,7 @@ module github.com/malikhan-dev/zenql/integration-test
 
 go 1.25
 
-require github.com/malikhan-dev/zenql/contracts/v2 v2.0.6
+require github.com/malikhan-dev/zenql/contracts/v2 v2.0.7
 
 replace github.com/malikhan-dev/zenql/contracts/v2 => ../contracts/v2
 
